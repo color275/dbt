@@ -541,3 +541,182 @@ models:
 ```
 `dbt test` 실행
 ![](2024-07-19-10-34-11.png)
+
+
+# DBT Docs
+
+### Benefits
+- 구성원 간 의사소통 향상
+- 규모와 상관없이 데이터 모델/파이프라인을 이해하기 쉽고 유지 관리가 가능
+- 새로운 팀 온보딩 가속화
+- 셀프 서비스 포털 역할 / 문의 사항에 대한 답변
+  
+![](2024-07-19-10-43-19.png)
+
+### Models Description
+- models 의 description 을 통해 데이터 정보를 입력
+- `models/stg/schema.yml` 에 아래 내용을 저장
+
+<details>
+
+<summary>models/stg/schema.yml</summary>
+
+```yml
+version: 2
+
+models:
+- name: stg_orders
+  description: "Order data staging table, including order details and relationships to products."
+  columns:
+  - name: order_id
+    description: "Unique identifier for each order."
+    tests:
+    - not_null
+    - unique
+  - name: product_id
+    description: "Foreign key reference to the product table."
+    tests:
+    - not_null
+    - relationships:
+        to: ref('stg_product')
+        field: product_id
+  - name: order_price
+    description: "Price of the order."
+    tests:
+    - not_negative
+
+- name: stg_customer
+  description: "Customer data staging table, containing customer details and additional calculated fields."
+  columns:
+  - name: customer_id
+    description: "Unique identifier for each customer."
+    tests:
+    - not_null
+    - unique
+  - name: username
+    description: "Unique username for each customer."
+    tests:
+    - not_null
+    - unique
+  - name: email
+    description: "Email address of the customer."
+    tests:
+    - not_null
+    - unique
+
+- name: stg_product
+  description: "Product data staging table, containing product details and categories."
+  columns:
+  - name: product_id
+    description: "Unique identifier for each product."
+    tests:
+    - not_null
+    - unique
+  - name: name
+    description: "Name of the product."
+    tests:
+    - not_null
+  - name: category
+    description: "Category of the product."
+    tests:
+    - not_null
+
+- name: stg_product_type_weights
+  description: "Product type weights data staging table, containing weights for different product types."
+  columns:
+  - name: product_id
+    description: "Unique identifier for each product."
+    tests:
+    - not_null
+    - unique
+  - name: products_weight
+    description: "Weight for the products type."
+    tests:
+    - not_null
+  - name: basket_weight
+    description: "Weight for the basket type."
+    tests:
+    - not_null
+  - name: order_weight
+    description: "Weight for the order type."
+    tests:
+    - not_null
+```
+
+</details>
+
+입력한 description 적용
+```bash
+dbt docs generate
+```
+
+docs 서버 시작
+```bash
+dbt docs serve
+```
+
+![](2024-07-19-15-02-26.png)
+![](2024-07-19-15-03-37.png)
+![](2024-07-19-15-04-05.png)
+
+
+
+### Docs Block
+DBT에서는 docs 블록을 사용하여 데이터 요소에 대한 설명을 추가 할 수 있다.
+
+<details>
+
+<summary>models/stg/docs_block.md</summary>
+
+```markdown
+{% docs promo_id %}
+### Promo ID 설명
+
+`promo_id`는 프로모션 코드를 나타내며, 다양한 할인 이벤트를 식별하는 데 사용됩니다. 각 프로모션 코드는 다음과 같은 값을 가질 수 있습니다:
+
+- **PROMO01**: 1+1 이벤트
+- **PROMO02**: 30% 할인 이벤트
+- **PROMO03**: 무료 배송 이벤트
+- **PROMO04**: 20% 할인 이벤트
+- **PROMO05**: 신규 가입 할인 이벤트
+- **PROMO06**: 시즌 오프 세일
+- **PROMO07**: 블랙 프라이데이 세일
+- **PROMO08**: 사이버 먼데이 세일
+- **PROMO09**: 크리스마스 특별 할인
+- **PROMO10**: 연말 정산 할인
+- **PROMO11**: 설날 특별 할인
+- **PROMO12**: 추석 특별 할인
+- **PROMO13**: 어린이날 특별 할인
+- **PROMO14**: 어버이날 특별 할인
+- **PROMO15**: 광복절 특별 할인
+- **PROMO16**: 한글날 특별 할인
+- **PROMO17**: 스승의 날 특별 할인
+- **PROMO18**: 밸런타인데이 특별 할인
+- **PROMO19**: 화이트데이 특별 할인
+- **PROMO20**: 할로윈 특별 할인
+
+각 프로모션 코드는 특정 이벤트와 연관되어 있어, 고객에게 다양한 혜택을 제공합니다.
+{% enddocs %}
+```
+
+</details>
+
+`models/stg/schema.yml` 의 stg_orders 에 아래 코드를 추가
+
+```yml
+- name: promo_id
+  description: "{{ doc('promo_id') }}"
+  tests:
+    - not_null
+```
+
+
+입력한 description 적용
+```bash
+dbt docs generate
+```
+
+docs 서버 시작
+```bash
+dbt docs serve
+```

@@ -2,17 +2,82 @@ version: 2
 
 models:
 - name: stg_orders
+  description: "Order data staging table, including order details and relationships to products."
   columns:
   - name: order_id
+    description: "Unique identifier for each order."
     tests:
     - not_null
     - unique
   - name: product_id
+    description: "Foreign key reference to the product table."
     tests:
     - not_null
     - relationships:
         to: ref('stg_product')
         field: product_id
   - name: order_price
+    description: "Price of the order."
     tests:
     - not_negative
+  - name: promo_id
+    description: "{{ doc('promo_id') }}"
+    tests:
+    - not_null
+
+- name: stg_customer
+  description: "Customer data staging table, containing customer details and additional calculated fields."
+  columns:
+  - name: customer_id
+    description: "Unique identifier for each customer."
+    tests:
+    - not_null
+    - unique
+  - name: username
+    description: "Unique username for each customer."
+    tests:
+    - not_null
+    - unique
+  - name: email
+    description: "Email address of the customer."
+    tests:
+    - not_null
+    - unique
+
+- name: stg_product
+  description: "Product data staging table, containing product details and categories."
+  columns:
+  - name: product_id
+    description: "Unique identifier for each product."
+    tests:
+    - not_null
+    - unique
+  - name: name
+    description: "Name of the product."
+    tests:
+    - not_null
+  - name: category
+    description: "Category of the product."
+    tests:
+    - not_null
+
+- name: stg_product_type_weights
+  description: "Product type weights data staging table, containing weights for different product types."
+  columns:
+  - name: product_id
+    description: "Unique identifier for each product."
+    tests:
+    - not_null
+    - unique
+  - name: products_weight
+    description: "Weight for the products type."
+    tests:
+    - not_null
+  - name: basket_weight
+    description: "Weight for the basket type."
+    tests:
+    - not_null
+  - name: order_weight
+    description: "Weight for the order type."
+    tests:
+    - not_null
