@@ -407,5 +407,137 @@ sources:
 
 </details>
 
+각 stg_****.sql 파일을 열어 `{{ source('ly1_raw','customer')}}` 와 같이 수정
+![](2024-07-18-17-50-36.png)
+
+dbt run 을 통해 정상 작동 확인
+
+리니지 확인
+![](2024-07-18-23-30-26.png)
+
+# Analyses 활용
+analyses는 데이터를 탐색하거나 임시 보고서를 생성하는 데 사용. 모델 파일의 컴파일된 출력을 시각적으로 검사하는 데 유용. analyses 디렉토리에 저장된 SQL 파일은 데이터베이스에서 직접 실행되어 결과를 확인.
+
+아래 쿼리를 analyses/monthly_customer_signup_trend.sql 에 저장
+<details>
+
+<summary>최근 1년 동안의 월별 고객 가입 수를 분석하여 트렌드를 파악</summary>
+
+```sql
+-- analyses/monthly_customer_signup_trend.sql
+
+WITH customer AS (
+    SELECT 
+        customer_id,
+        date_joined
+    FROM {{ source('ly1_raw', 'customer') }}
+)
+
+SELECT
+    DATE_TRUNC('month', date_joined) AS month,
+    COUNT(customer_id) AS customer_count
+FROM customer
+WHERE date_joined >= DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '1 year'
+GROUP BY month
+ORDER BY month
+```
+
+</details>
+
+dbt compile 후 `target/compiled/myfirstdbt/analyses/` 에서 확인. 또는 vscode 의 extension 을 통해 확인
+![](2024-07-19-09-56-25.png)
+![](2024-07-19-00-42-16.png)
 
 
+# TEST
+DBT의 테스트는 크게 Singular 테스트와 Generic 테스트로 나뉜다.
+
+| 특징      | Singular 테스트                               | Generic 테스트                                                     |
+| --------- | --------------------------------------------- | ------------------------------------------------------------------ |
+| 목적      | 특정 비즈니스 로직 또는 요구사항 검증         | 공통적인 데이터 무결성 검증 (예: not_null, unique 등)              |
+| 정의 방법 | `tests` 디렉토리에 개별 SQL 파일로 정의       | `schema.yml` 등 파일에 매개변수화된 형태로 정의                       |
+| 재사용성  | 재사용하기 어려움                             | 여러 모델과 컬럼에 쉽게 적용 가능                                  |
+| 사용 예시 | 특정 조건을 만족하는 레코드가 존재하는지 확인 | 컬럼 값이 null이 아닌지, 유일한지, 특정 값 집합에 속하는지 등 확인 |
+
+### Singular 테스트
+- Singular 테스트는 특정한 비즈니스 로직이나 요구사항을 검증하기 위해 작성된 개별 SQL 쿼리. 
+- 주로 특정한 상황이나 케이스를 테스트하는 데 사용. 
+- Singular 테스트는 tests 디렉토리에 .sql 파일로 작성되며, 각 파일은 독립적으로 실행.
+
+<details>
+
+<summary>tests/not_null_order_price.sql</summary>
+
+```sql
+-- tests/not_null_order_price.sql
+-- orders 테이블에서 order_price가 음수인 레코드가 있는지 확인. 만약 결과가 반환되면, 테스트는 실패한 것으로 간주
+SELECT *
+FROM {{ source('ly1_raw','orders') }}
+WHERE order_price < 0
+```
+
+</details>
+
+![](2024-07-19-10-11-32.png)
+
+`dbt test` 를 통해 테스트 수행
+
+
+### Generic 테스트
+- DBT는 몇 가지 기본적인 Generic 테스트를 제공하며, 이는 데이터 무결성을 확인하는 데 유용. 
+- 예를 들어, not_null, unique, accepted_values 등이 있음.
+
+#### 내장된 Generic 테스트
+
+<details>
+
+<summary>models/stg/schema.yml</summary>
+
+```yml
+version: 2
+
+models:
+- name: stg_orders
+  columns:
+  - name: order_id
+    tests:
+    - not_null
+    - unique
+  - name: product_id
+    tests:
+    - not_null
+    - relationships:
+        to: ref('stg_product')
+        field: product_id
+
+```
+
+</details>
+
+`dbt test` 실행
+![](2024-07-19-10-23-26.png)
+
+#### 커스텀 Generic 테스트
+
+<details>
+
+<summary></summary>
+
+```sql
+{% test not_negative(model, column_name) %}
+    SELECT *
+    FROM {{ model }}
+    WHERE {{ column_name }} < 0
+{% endtest %}
+```
+
+</details>
+
+`models/stg/schema.yml`에 아래 내용 추가
+```yml
+  - name: order_price
+    tests:
+    - not_negative
+```
+`dbt test` 실행
+![](2024-07-19-10-34-11.png)
