@@ -3,6 +3,7 @@
 ```bash
 docker-compose up -d
 docker ps
+# password : Admin1234
 docker exec -it dbt_postgres psql -U admin -d ecommerce
 ```
 

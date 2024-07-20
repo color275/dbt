@@ -9,6 +9,8 @@ pip install dbt-redshift
 pip install psycopg2
 pip install faker
 pip install python-dotenv
+# for aws-mwaa-local-runner 
+pip install 'apache-airflow[amazon]'
 ```
 
 dbt 설치

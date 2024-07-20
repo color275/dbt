@@ -1,0 +1,7 @@
+sources:
+- name: ly1_raw
+  tables:
+  - name: customer
+  - name: orders
+  - name: product
+  - name: product_type_weights
