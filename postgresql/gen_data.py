@@ -113,19 +113,22 @@ def update_random_order(connection):
             new_order_cnt = random.randint(1, 10)
             new_order_price = random.randint(5, 50) * 1000
             new_order_dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            last_update_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             update_query = """
             UPDATE ly1_raw.orders SET
                 order_cnt = %s,
                 order_price = %s,
-                order_dt = %s
+                order_dt = %s,
+                last_update_time = %s
             WHERE order_id = %s
             """
-            update_values = (new_order_cnt, new_order_price, new_order_dt, order_id)
+            update_values = (new_order_cnt, new_order_price, new_order_dt, last_update_time, order_id)
             cursor.execute(update_query, update_values)
             connection.commit()
             print(f"Order {order_id} updated successfully.")
 
+            
 def write_logs_with_db_insertion(db_config, cnt_per_sec):
     db_connection = connect_to_database(db_config)
     if db_connection is None:

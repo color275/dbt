@@ -1020,3 +1020,75 @@ dbt run --select stg_orders
 
 
 실제로 last_batch_time 을 통해 조건에 맞는 데이터만 upsert 가 되었음을 알 수 있고 필요한 데이터만 추가/변경 되었으므로 성능 상 유리하다.
+
+#### materialized='snapshot'
+
+일반적으로 OLTP 서비스는 현재 시점의 데이터만 저장하지만 DW 에서는 데이터의 변경 이력을 저정해야 할 필요가 있다. 이때 DBT 의 snapshot 을 통해 간단하게 변경 이력을 저장할 수 있다.
+dbt Snapshot은 데이터의 특정 시점의 상태를 기록하는 기능이다. 이를 통해 데이터 변경 내역을 추적하고, 시간에 따라 데이터가 어떻게 변경되었는지를 알 수 있다. Snapshot 기능은 주로 Slowly Changing Dimensions (SCD)를 구현하는 데 사용된다.
+
+주요 개념 및 동작 방식
+
+	•	Snapshot: 테이블의 특정 시점 상태를 캡처하여 저장합니다.
+	•	Strategy: Snapshot이 변경 사항을 추적하는 방법을 지정합니다. 일반적으로 ‘timestamp’와 ‘check’ 전략이 있습니다.
+	•	timestamp: updated_at 컬럼을 기준으로 변경 사항을 추적합니다.
+	•	check: 특정 컬럼의 값이 변경되었는지를 확인하여 변경 사항을 추적합니다.
+
+Snapshot의 주요 컬럼 설명
+
+	1.	dbt_scd_id
+	•	이 컬럼은 Snapshot 내에서 각 레코드를 고유하게 식별하는 ID입니다. 이를 통해 각 레코드의 변경 내역을 추적할 수 있습니다.
+	2.	dbt_updated_at
+	•	이 컬럼은 레코드가 마지막으로 업데이트된 시점을 나타냅니다. 주로 timestamp 전략에서 사용되며, 레코드가 언제 수정되었는지를 기록합니다.
+	3.	dbt_valid_from
+	•	이 컬럼은 해당 레코드가 유효한 시작 시점을 나타냅니다. 즉, 이 시점부터 해당 데이터 상태가 유효함을 의미합니다.
+	4.	dbt_valid_to
+	•	이 컬럼은 해당 레코드가 유효한 종료 시점을 나타냅니다. 레코드가 더 이상 유효하지 않게 되는 시점을 기록합니다. 이 값이 NULL일 경우, 해당 레코드가 현재 시점에서도 유효함을 의미합니다.
+
+
+<details>
+
+<summary>snapshots/orders_history.sql</summary>
+
+```sql
+{% snapshot orders_history %}
+
+{{
+    config(
+        target_schema='ly2_stg',
+        unique_key='order_id',
+        strategy='timestamp',
+        updated_at='last_update_time'
+    )
+}}
+
+SELECT * FROM {{ source('ly1_raw', 'orders') }}
+
+{% endsnapshot %}
+```
+
+</details>
+
+dbt snapshot 실행 시 orders_history 테이블이 생성되며, 최초 생성 시에는 모든 값이 유효하므로 `dbt_valid_to` 컬럼은 모두 null 이다.
+```bash
+dbt snapshot
+```
+```sql
+select order_id, last_update_time, dbt_scd_id, dbt_updated_at, dbt_valid_from, dbt_valid_to
+from ly2_stg.orders_history
+where dbt_valid_to is not null;
+```
+![](2024-07-20-12-51-00.png)
+
+1~2분 후 다시 dbt snapshot 을 실행하게 되면 orders 에 업데이트 된 데이터들이 추가되고 과거 데이터는 dbt_valid_to 에 날짜값을 저장한 상태로 남게된다.
+```bash
+dbt snapshot
+```
+```sql
+select order_id, last_update_time, dbt_scd_id, dbt_updated_at, dbt_valid_from, dbt_valid_to
+from ly2_stg.orders_history
+where dbt_valid_to is not null;
+```
+![](2024-07-20-12-52-35.png)
+
+조회된 주문번호로 조회를 하게 되면 이력을 확인할 수 있다. 아래와 같은 경우 주문수량이 8개에서 10개로 변경되었음을 알 수 있다.
+![](2024-07-20-12-54-08.png)
