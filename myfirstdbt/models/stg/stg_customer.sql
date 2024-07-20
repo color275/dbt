@@ -14,7 +14,8 @@ WITH customer AS (
         CASE
             WHEN phone_number LIKE '+%' THEN SUBSTRING(phone_number FROM 1 FOR POSITION('-' IN phone_number) - 1)
             ELSE NULL
-        END AS country_code
+        END AS country_code,
+        {{ timestamp_to_string('last_update_time', 'YYYY-MM-DD HH24:MI:SS') }} AS last_update_time
     FROM {{ source('ly1_raw','customer')}}
 )
 

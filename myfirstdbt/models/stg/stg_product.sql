@@ -11,7 +11,8 @@ WITH product AS (
             WHEN price <= 10000 THEN 'Low'
             WHEN price <= 20000 THEN 'Medium'
             ELSE 'High'
-        END AS price_category
+        END AS price_category,
+        {{ timestamp_to_string('last_update_time', 'YYYY-MM-DD HH24:MI:SS') }} AS last_update_time
     FROM {{ source('ly1_raw','product')}}
 )
 

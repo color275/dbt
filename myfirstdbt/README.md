@@ -23,10 +23,10 @@ DataWarehouse(DW) 내에서 데이터 변환을 도와주는 도구. ELT 중 T �
 # ELT vs ETL
 
 ### ETL Architecture
-![](./img/2024-07-17-09-41-04.png)
+![](./img/./img/2024-07-17-09-41-04.png)
 
 ### ELT Architecture
-![](./img/2024-07-17-09-41-57.png)
+![](./img/./img/2024-07-17-09-41-57.png)
 
 ### Why Shift from ETL to ELT?
 1. 비용 효율적
@@ -106,19 +106,19 @@ JOIN product_data p ON o.product_id = p.product_id
 ```
 </details>
 
-![](./img/2024-07-17-10-07-39.png)
+![](./img/./img/2024-07-17-10-07-39.png)
 
 DBT 실행
 ```bash
 dbt run
 ```
-![](./img/2024-07-17-10-09-39.png)
+![](./img/./img/2024-07-17-10-09-39.png)
 
 DW 확인 : `customer_orders_product` 이름의 View 생성
-![](./img/2024-07-17-10-10-05.png)
+![](./img/./img/2024-07-17-10-10-05.png)
 
 데이터 확인 : VSCode 의 DBT Extesions를 통해 확인 가능
-![](./img/2024-07-17-10-11-15.png)
+![](./img/./img/2024-07-17-10-11-15.png)
 
 > [!TIP] VIEW 로 생성된 이유
 > default 가 View 이기 때문
@@ -126,10 +126,10 @@ DW 확인 : `customer_orders_product` 이름의 View 생성
 > View 가 아닌 Table 등으로 변경하기 위해서는 dbt_project.yml 의 models 부분을 수정하거나 models 의 sql 파일 상단에 정의
 
 dbt_project.yml 
-![](./img/2024-07-17-10-19-39.png)
+![](./img/./img/2024-07-17-10-19-39.png)
 
 customer_orders_product.sql
-![](./img/2024-07-17-10-22-01.png)
+![](./img/./img/2024-07-17-10-22-01.png)
 
 # Staging 모델 생성
 > 각 raw 테이블들을 스테이징 레이어에서 사용할 수 있도록 stg_xxx 명명으로 추가
@@ -204,8 +204,8 @@ SELECT * FROM product
 ```
 </details>
 
-![](./img/2024-07-18-15-19-33.png)
-![](./img/2024-07-18-16-03-24.png)
+![](./img/./img/2024-07-18-15-19-33.png)
+![](./img/./img/2024-07-18-16-03-24.png)
 
 > [!TIP]
 > customer_orders_product 테이블은 앞으로 사용하지 않으므로 삭제
@@ -263,7 +263,7 @@ dbt run
 생성된 스키마 구조를 확인 했을 때 아래 캡처처럼 f_orders 테이블이 ly2_stg 스키마 내 view 형태로 생성되었음을 알 수 있다.
 - ly2_stg 에 생성된 이유는 최초 dbt init 때 지정한 schema 가 ly2_stg 이므로 default 로 사용이 되었다. (~/.dbt/profiles.yml)
 - view 로 생성된 이유는 dbt_project.yml 내 models 섹션에 materialized 를 정의하지 않으면 default view 로 생성된다.
-![](./img/2024-07-18-16-19-06.png)
+![](./img/./img/2024-07-18-16-19-06.png)
 
 f_orders 테이블이 ly3_mart 스키마 내에 table 형태로 생성될 수 있도록 수정하자.
 dbt_project.yml 파일에 models 부분을 아래와 같이 수정한 후 dbt run 을 실행한다.
@@ -283,7 +283,7 @@ dbt run
 
 f_orders 이 테이블 형태로 생성이 되었지만 스키마가 ly2_stg_ly3_mart 로 만들어졌다. 왜?
 [참고링크](https://docs.getdbt.com/docs/build/custom-schemas#how-does-dbt-generate-a-models-schema-name) 에 따르면 `generate_schema_name` 매크로 적용을 받기 때문에 `{{ default_schema }}_{{ custom_schema_name | trim }}`로 스키마가 생성되게 된다. 따라서 이 매크로를 오버라이딩 하면 된다.
-![](./img/2024-07-18-16-26-37.png)
+![](./img/./img/2024-07-18-16-26-37.png)
 
 macros/generate_schema_name.sql 를 생성한 후 아래 매크로를 저장한다. ({{ default_schema }}_ 를 삭제함)
 
@@ -311,14 +311,14 @@ macros/generate_schema_name.sql 를 생성한 후 아래 매크로를 저장한�
 </details>
 
 dbt run 실행하면 아래와 같이 ly3_mart 스키마가 정상적으로 생성된 것을 확인할 수 있다.
-![](./img/2024-07-18-16-34-34.png)
+![](./img/./img/2024-07-18-16-34-34.png)
 
 이제 f_orders 의 데이터도 확인해 보자.
-![](./img/2024-07-18-16-36-08.png)
-![](./img/2024-07-18-16-37-11.png)
+![](./img/./img/2024-07-18-16-36-08.png)
+![](./img/./img/2024-07-18-16-37-11.png)
 
 리니지도 확인해 보자
-![](2024-07-18-16-43-49.png)
+![](./img/2024-07-18-16-43-49.png)
 
 |          | 뷰(View)                                  | 테이블(Table)                                                                         |
 | -------- | ----------------------------------------- | ------------------------------------------------------------------------------------- |
@@ -337,7 +337,7 @@ CSV 파일과 같은 데이터를 데이터베이스에 로드하는 기능. 이
         +schema: ly1_raw
     ```
 - dbt seed 실행
-    ![](2024-07-18-17-02-43.png)
+    ![](./img/2024-07-18-17-02-43.png)
 
 seed 를 활용하여 테이블을 생성했으니 stg_product_type_weights 를 생성하고, f_orders_weights.sql 도 만들어 보자.
 
@@ -408,12 +408,12 @@ sources:
 </details>
 
 각 stg_****.sql 파일을 열어 `{{ source('ly1_raw','customer')}}` 와 같이 수정
-![](2024-07-18-17-50-36.png)
+![](./img/2024-07-18-17-50-36.png)
 
 dbt run 을 통해 정상 작동 확인
 
 리니지 확인
-![](2024-07-18-23-30-26.png)
+![](./img/2024-07-18-23-30-26.png)
 
 # Analyses 활용
 analyses는 데이터를 탐색하거나 임시 보고서를 생성하는 데 사용. 모델 파일의 컴파일된 출력을 시각적으로 검사하는 데 유용. analyses 디렉토리에 저장된 SQL 파일은 데이터베이스에서 직접 실행되어 결과를 확인.
@@ -445,8 +445,8 @@ ORDER BY month
 </details>
 
 dbt compile 후 `target/compiled/myfirstdbt/analyses/` 에서 확인. 또는 vscode 의 extension 을 통해 확인
-![](2024-07-19-09-56-25.png)
-![](2024-07-19-00-42-16.png)
+![](./img/2024-07-19-09-56-25.png)
+![](./img/2024-07-19-00-42-16.png)
 
 
 # TEST
@@ -478,7 +478,7 @@ WHERE order_price < 0
 
 </details>
 
-![](2024-07-19-10-11-32.png)
+![](./img/2024-07-19-10-11-32.png)
 
 `dbt test` 를 통해 테스트 수행
 
@@ -515,7 +515,7 @@ models:
 </details>
 
 `dbt test` 실행
-![](2024-07-19-10-23-26.png)
+![](./img/2024-07-19-10-23-26.png)
 
 #### 커스텀 Generic 테스트
 
@@ -540,7 +540,7 @@ models:
     - not_negative
 ```
 `dbt test` 실행
-![](2024-07-19-10-34-11.png)
+![](./img/2024-07-19-10-34-11.png)
 
 
 # DBT Docs
@@ -551,7 +551,7 @@ models:
 - 새로운 팀 온보딩 가속화
 - 셀프 서비스 포털 역할 / 문의 사항에 대한 답변
   
-![](2024-07-19-10-43-19.png)
+![](./img/2024-07-19-10-43-19.png)
 
 ### Models Description
 - models 의 description 을 통해 데이터 정보를 입력
@@ -602,7 +602,6 @@ models:
     description: "Email address of the customer."
     tests:
     - not_null
-    - unique
 
 - name: stg_product
   description: "Product data staging table, containing product details and categories."
@@ -655,9 +654,9 @@ docs 서버 시작
 dbt docs serve
 ```
 
-![](2024-07-19-15-02-26.png)
-![](2024-07-19-15-03-37.png)
-![](2024-07-19-15-04-05.png)
+![](./img/2024-07-19-15-02-26.png)
+![](./img/2024-07-19-15-03-37.png)
+![](./img/2024-07-19-15-17-56.png)
 
 
 
@@ -721,4 +720,303 @@ docs 서버 시작
 dbt docs serve
 ```
 
-![](2024-07-19-15-15-56.png)
+![](./img/2024-07-19-15-15-56.png)
+
+
+# DBT Languages
+
+DBT 는 크게 아래 3가지 언어를 사용함
+- SQL : models, tests 생성
+- YAML : Configuration
+- Jinja : 다이나믹한 SQL, YAML 사용을 위해
+
+Most common Python Data Types
+
+| Data Type    | Ordered | Mutable | Example                                                                                                    |
+| ------------ | ------- | ------- | ---------------------------------------------------------------------------------------------------------- |
+| Numbers      | No      | Yes     | `123`, `1.23`, `1 + 2j`                                                                                    |
+| Strings      | No      | No      | `'This is a string'`, `'This is also a string'`                                                            |
+| Booleans     | No      | No      | `True`, `False`                                                                                            |
+| Lists        | Yes     | Yes     | `[1, 2, 3, 4, 5]`, `['a', 'b', 'c', 'd', 'e']`                                                             |
+| Tuples       | Yes     | No      | `(1, 2, 3, 4, 5)`, `('a', 'b', 'c', 'd', 'e')`                                                             |
+| Dictionaries | No      | Yes     | `{'key_1': 'value_1', 'key_2': 'value_2', 'key_3': 'value_3'}`, `{'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5}` |
+| Sets         | No      | Yes     | `{1, 2, 3, 4, 5}`, `{'a', 'b', 'c', 'd', 'e'}`                                                             |
+
+Jinja를 사용하면 반복 작업을 줄이고, SQL 쿼리를 동적으로 생성하며, 변수를 사용하여 코드의 가독성을 높일 수 있다.
+
+### 예제1
+각 테이블의 레코드 수가 예상된 수와 일치하는지 테스트
+
+<details>
+
+<summary>tests/record_count_check.sql</summary>
+
+```sql
+-- tests/record_count_check.sql
+
+-- Define the expected record counts for each table
+{% set expected_counts = {
+    'stg_customer': 0,
+    'stg_orders': 20,
+    'stg_product': 0
+} %}
+
+-- Test the count of records in each table
+{% for table, expected_count in expected_counts.items() %}
+SELECT '{{ table }}' AS table_name,
+       (SELECT COUNT(*) FROM {{ ref(table) }}) AS record_count,
+       {{ expected_count }} AS expected_count
+WHERE (SELECT COUNT(*) FROM {{ ref(table) }}) >= {{ expected_count }}
+{% if not loop.last %} UNION ALL {% endif %}
+{% endfor %}
+```
+
+</details>
+
+```bash
+dbt test
+```
+![](./img/2024-07-19-22-32-56.png)
+
+### 예제2
+timestamp 컬럼을 YYYY-MM-DD HH24:MI:SS 의 string 타입으로 변경
+
+<details>
+
+<summary>timestamp 관련</summary>
+
+```sql
+-- macros/timestamp_to_string.sql
+{% macro timestamp_to_string(timestamp_col, dt_format='YYYY-MM-DD HH24:MI:SS') %}
+    {{ original_price }} * (1 - {{ discount_rate }} / 100)
+    TO_CHAR({{timestamp_col}}, {{dt_format}})
+{% endmacro %}
+```
+
+```sql
+-- macros/ko_now_string.sql
+{% macro ko_now_string(timezone='Asia/Seoul', dt_format='YYYY-MM-DD HH24:MI:SS') %}
+    TO_CHAR(TIMEZONE('{{timezone}}', CURRENT_TIMESTAMP), '{{dt_format}}')
+{% endmacro %}
+```
+
+</details>
+
+
+<details>
+
+<summary>models/stg/stg_orders.sql</summary>
+
+```sql
+WITH orders AS (
+    SELECT
+        order_id,
+        promo_id,
+        order_cnt,
+        order_price,
+        order_dt,
+        customer_id,
+        product_id,
+        -- 총 주문 금액 계산
+        order_cnt * order_price AS total_order_value,
+        {{ timestamp_to_string('last_update_time') }} AS last_update_time,
+        {{ ko_now_string() }} as last_batch_time
+    FROM {{ source('ly1_raw','orders')}}
+)
+SELECT * FROM orders
+```
+
+</details>
+
+```bash
+dbt run
+```
+
+stg/stg_customer.sql, stg/stg_product.sql 파일도 동일한 패턴으로 변경 
+
+### 예제3
+할인 가격을 계산하는 매크로를 작성하고 이를 SQL 모델에서 사용
+
+<details>
+
+<summary>macros/discount_price.sql</summary>
+
+```sql
+-- macros/discount_price.sql
+{% macro discount_price(original_price, discount_rate) %}
+    {{ original_price }} * (1 - {{ discount_rate }} / 100)
+{% endmacro %}
+```
+
+</details>
+
+
+<details>
+
+<summary>models/mart/macro_example_orders.sql</summary>
+
+```sql
+-- models/mart/macro_example_orders.sql
+WITH orders AS (
+    SELECT 
+        o.order_id,
+        o.order_price,
+        o.order_cnt,
+        p.name AS product_name,
+        c.username AS customer_name,
+        -- 할인가격 계산
+        {{ discount_price('o.order_price', 10) }} AS discounted_price
+    FROM {{ ref('stg_orders') }} o
+    JOIN {{ ref('stg_product') }} p ON o.product_id = p.product_id
+    JOIN {{ ref('stg_customer') }} c ON o.customer_id = c.customer_id
+)
+
+SELECT * FROM orders
+```
+
+</details>
+
+![](./img/2024-07-19-22-55-07.png)
+
+```bash
+dbt run
+```
+![](./img/2024-07-19-22-56-03.png)
+
+
+# DBT Packages
+[공식 DBT 패키지 스토어](https://hub.getdbt.com/)
+![](./img/2024-07-20-09-58-46.png)
+![](./img/2024-07-20-09-59-16.png)
+
+<details>
+
+<summary>packages.yml</summary>
+
+```yaml
+packages:
+  - package: dbt-labs/dbt_utils
+    version: 1.2.0
+```
+
+</details>
+
+```bash
+dbt deps
+```
+
+<details>
+
+<summary>models/mart/deduplicate_orders.sql</summary>
+
+```sql
+{{ dbt_utils.deduplicate(
+    relation=ref('stg_orders'),
+    partition_by='customer_id, order_dt',
+    order_by="last_update_time desc"
+) }}
+```
+
+</details>
+
+![](2024-07-20-10-12-46.png)
+
+# Materialization 
+
+#### Materialization Type
+| Materialization Type           | Description                                                                                                |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| `materialized='view'`          | SQL 쿼리 결과를 뷰(View)로 저장합니다. 데이터는 쿼리할 때마다 새로 계산됩니다.                             |
+| `materialized='table'`         | SQL 쿼리 결과를 테이블(Table)로 저장합니다. 데이터는 쿼리가 실행될 때 테이블로 저장되어 나중에 참조됩니다. |
+| `materialized='ephemeral'`     | SQL 쿼리 결과를 임시 테이블(Ephemeral)로 저장하지 않고, 다른 모델에서 바로 사용되도록 만듭니다.            |
+| `materialized='incremental'`   | SQL 쿼리 결과를 점진적(Incremetal)으로 저장하여, 이전에 계산된 데이터에 새로운 데이터를 추가합니다.        |
+| `{% snapshot snapshot_name %}` | 특정 시점의 데이터를 스냅샷(Snapshot)으로 저장하여 데이터 변화를 추적하고 관리합니다.                      |
+
+#### Table VS View
+|                  | Table | View |
+| ---------------- | ----- | ---- |
+| 복잡한 변환 로직 | ✅     |      |
+| 성능 향상        | ✅     |      |
+| 간단한 변환 로직 |       | ✅    |
+| 저장 비용 절감   |       | ✅    |
+
+
+> [!TIP] is_incremental() 함수가 TRUE를 반환하는 조건
+> is_incremental() 함수는 다음 모든 조건이 충족될 때만 TRUE를 반환
+>- 대상 테이블이 데이터베이스에 이미 존재
+>- dbt가 풀 리프레시 모드로 실행되지 않아야
+>   - 예: `dbt run --full-refresh` 가 아님
+>- 모델이 `materialized='incremental'`로 설정되어 있어야
+
+#### materialized='incremental'
+
+주문 이력을 저장하는 stg_orders 테이블은 insert, update 가 발생되는 트랜잭션 테이블이다. View 구조로 활용하게 되면 성능상 이슈가 발생할 수 있다. table 구조로 생성할 때 truncate/insert 는 대용량 성격에 맞지 않으며 append 만 처리하게 되면 update 에 대한 정합성을 지킬 수 없다. 따라서 merge 와 같은 데이터 처리가 필요하며 이때 dbt의 incremental 를 사용한다.
+
+<details>
+
+<summary>models/stg_orders.sql</summary>
+
+```sql
+{{
+  config(
+    materialized='incremental',
+    unique_key='order_id',
+    incremental_strategy='merge'
+  )
+}}
+
+-- 테이블이 존재하지 않으면 초기 로딩 수행
+{% if not is_incremental() %}
+
+SELECT
+    order_id,
+    customer_id,
+    product_id,
+    order_cnt,
+    order_price,
+    order_dt,
+    order_cnt * order_price AS total_order_value,
+    {{ timestamp_to_string('last_update_time') }} AS last_update_time,
+    {{ ko_now_string() }} as last_batch_time
+FROM {{ source('ly1_raw','orders')}}
+
+{% else %}
+
+-- 증분 로딩 시 MERGE 사용
+select order_id,
+    customer_id,
+    product_id,
+    order_cnt,
+    order_price,
+    order_dt,
+    order_cnt * order_price AS total_order_value,
+    {{ timestamp_to_string('last_update_time') }} AS last_update_time,
+    {{ ko_now_string() }} as last_batch_time
+FROM {{ source('ly1_raw','orders')}}
+where {{ timestamp_to_string('last_update_time') }} >= ( 
+                        select max(last_update_time) 
+                        from {{ this }}
+                   )
+
+{% endif %}
+```
+
+</details>
+
+`--full-refresh` 옵션을 통해 stg_orders 를 재구성한다.
+```bash
+dbt run --select stg_orders --full-refresh
+```
+target/run/myfirstdbt/models/stg/stg_orders.sql 에서 최초 실행 시 테이블 생성에 대한 SQL 구문을 확인할 수 있다.
+![](2024-07-20-12-06-26.png)
+
+
+1분 후 다시 한번 실행한다.
+```bash
+dbt run --select stg_orders
+```
+이 후 증분에 대해서는 target/run/myfirstdbt/models/stg/stg_orders.sql 에서 merge 로 동작됨을 알 수 있다.
+![](2024-07-20-12-08-31.png)
+
+
+실제로 last_batch_time 을 통해 조건에 맞는 데이터만 upsert 가 되었음을 알 수 있고 필요한 데이터만 추가/변경 되었으므로 성능 상 유리하다.

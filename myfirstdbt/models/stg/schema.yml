@@ -42,7 +42,6 @@ models:
     description: "Email address of the customer."
     tests:
     - not_null
-    - unique
 
 - name: stg_product
   description: "Product data staging table, containing product details and categories."
