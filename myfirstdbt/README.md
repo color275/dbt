@@ -20,6 +20,10 @@ DataWarehouse(DW) 내에서 데이터 변환을 도와주는 도구. ELT 중 T �
    - 코드 기반 플랫폼 
    - 문서, 배포 자동화
   
+# DBT 관련 Link
+- [분석 엔지니어링 용어집](https://docs.getdbt.com/glossary)
+- [DBT Best Practics](https://docs.getdbt.com/best-practices)
+
 # ELT vs ETL
 
 ### ETL Architecture
@@ -1131,10 +1135,11 @@ where order_id = 2452;
 
 1. Local MWASS Git Clone
     ```bash
-    # dbt 디렉토리로 이동
+    # 메인 디렉토리로 이동
     git clone https://github.com/aws/aws-mwaa-local-runner.git
     rm -rf aws-mwaa-local-runner/.git
     ```
+    ![](2024-07-25-08-30-43.png)
 
 2. `aws-mwaa-local-runner/requirements/requirements.txt` 에 `astronomer-cosmos` 추가 
     > [!TIP]
@@ -1166,14 +1171,14 @@ where order_id = 2452;
     ``` 
 
 4. `0.0.0.0:8080` 으로 접속
-    ![](2024-07-20-20-00-47.png)
+    ![](./img/2024-07-20-20-00-47.png)
     
 
 5. Connections 추가
    - Admin > Connections
-     ![](2024-07-20-20-46-08.png)
+     ![](./img/2024-07-20-20-46-08.png)
    - 버튼 + 클릭
-     ![](2024-07-20-20-47-30.png)
+     ![](./img/2024-07-20-20-47-30.png)
    - 아래 내용 입력
      - postgres_dbt
      - Postgres
@@ -1182,6 +1187,55 @@ where order_id = 2452;
      - admin
      - Admin1234
      - 5432
-     ![](2024-07-20-20-49-34.png)
+     ![](./img/2024-07-20-20-49-34.png)
 
+6. myfirstdbt 디렉토리를 `aws-mwaa-local-runner/dags/dbt/` 로 복사
+    ![](./img/2024-07-21-08-49-24.png)
 
+7. myfirstdbt 를 위한 dag 생성
+    <details>
+
+    <summary>aws-mwaa-local-runner/dags/myfirstdbt.py</summary>
+
+    ```python
+    import os
+    from datetime import datetime
+    from cosmos import DbtDag, ProjectConfig, ProfileConfig, ExecutionConfig
+    # from cosmos.profiles import PostgresUserPasswordProfileMapping
+    # from cosmos.profiles import RedshiftUserPasswordProfileMapping
+    from cosmos.profiles import PostgresUserPasswordProfileMapping
+    from cosmos.constants import ExecutionMode
+
+    profile_config = ProfileConfig(
+        profile_name="default",
+        target_name="dev",
+        profile_mapping=PostgresUserPasswordProfileMapping(
+            conn_id="postgres_dbt",
+            profile_args={"schema": "ly2_stg"},
+        )
+    )
+
+    execution_config = ExecutionConfig(
+        dbt_executable_path=f"{os.environ['AIRFLOW_HOME']}/dbt_venv/bin/dbt",
+    )
+
+    my_cosmos_dag = DbtDag(
+        project_config=ProjectConfig(
+            dbt_project_path="/usr/local/airflow/dags/dbt/myfirstdbt",
+        ),
+        profile_config=profile_config,
+        execution_config=execution_config,
+        # normal dag parameters
+        schedule_interval="@hourly",
+        start_date=datetime(2023, 1, 1),
+        catchup=False,
+        dag_id="myfirstdbt",
+        default_args={"retries": 0},
+    )
+    ```
+
+    </details>
+
+9. Airflow UI 확인
+![](./img/2024-07-21-08-51-38.png)
+![](./img/2024-07-21-08-51-55.png)

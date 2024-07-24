@@ -1,4 +1,13 @@
-# python 환경 구성
+- [Python 환경 구성](#python-환경-구성)
+- [DW 셋업](#dw-셋업)
+- [DBT 셋업](#dbt-셋업)
+    - [DBT \<-\> DW 연결 확인](#dbt---dw-연결-확인)
+    - [VSCode Extensions](#vscode-extensions)
+- [DBT 실습 시작](#dbt-실습-시작)
+
+
+
+# Python 환경 구성
 - dbt 외 필요한 lib 추가 설치
 ```bash
 python3.10 -m venv .venv
@@ -13,7 +22,13 @@ pip install python-dotenv
 pip install 'apache-airflow[amazon]'
 ```
 
-dbt 설치
+# DW 셋업
+실습이므로 Redshift, Snowfake, Bigquery 대신 Local 에 PostgreSQL을 설치해서 사용한다.
+- [PostgreSQL 셋업 링크](https://github.com/color275/dbt/tree/846887943c2365b775c73bc2a5c5ede1ade43666/postgresql)
+
+
+
+# DBT 셋업
 ```bash
 dbt init myfirstdbt
 ``````
@@ -43,3 +58,10 @@ dbt debug
 
 3. Extension 기능
    ![](./img/./img/2024-07-17-09-14-15.png)
+
+
+# DBT 실습 시작
+[실습 링크](https://github.com/color275/dbt/tree/846887943c2365b775c73bc2a5c5ede1ade43666/myfirstdbt)
+
+
+
