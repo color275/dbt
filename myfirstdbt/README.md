@@ -1142,6 +1142,7 @@ where order_id = 2452;
     ![](2024-07-25-08-30-43.png)
 
 2. `aws-mwaa-local-runner/requirements/requirements.txt` 에 `astronomer-cosmos` 추가 
+   ![](2024-07-25-08-37-56.png)
     > [!TIP]
     > [astronomer-cosmos](https://astronomer.github.io/astronomer-cosmos/index.html)는 Astronomer에서 제공하는 데이터 오케스트레이션 솔루션으로, dbt와 Apache Airflow를 통합하여 데이터 파이프라인의 개발 및 운영을 간소화하는 도구이다.
     ```bash

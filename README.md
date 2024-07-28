@@ -10,12 +10,12 @@
 # Python 환경 구성
 - dbt 외 필요한 lib 추가 설치
 ```bash
-python3.10 -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
 pip install dbt-core
 pip install dbt-redshift
-pip install psycopg2
+pip install psycopg2 # DW로 PostgreSql 미사용시 설치 필요 없음
 pip install faker
 pip install python-dotenv
 # for aws-mwaa-local-runner 
