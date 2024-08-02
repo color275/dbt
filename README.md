@@ -65,3 +65,6 @@ dbt debug
 
 
 
+ken-01.cnxmlkrrl8mw.ap-northeast-2.redshift.amazonaws.com
+
+![](2024-07-28-13-58-38.png)
